@@ -1,17 +1,20 @@
 package drivers
 
 import (
+	"log"
 	"testing"
 
 	"github.com/joho/godotenv"
 )
 
-func TestConnect(t *testing.T) {
+func init() {
 	err := godotenv.Load("../.env")
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
+}
 
+func TestConnect(t *testing.T) {
 	if got := Connect(); got == nil {
 		t.Fatal("Connection is not set..")
 	}
