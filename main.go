@@ -21,7 +21,10 @@ func init() {
 	}
 
 	// Set database connection.
-	models.DB = drivers.Connect()
+	models.DB, err = drivers.DBConnect()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Make migrations from the schema file.
 	db := models.Migrate()

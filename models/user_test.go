@@ -23,7 +23,10 @@ func init() {
 		log.Fatal(err)
 	}
 
-	DB = drivers.Connect()
+	DB, err = drivers.DBConnect()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Set the user info to use in testing.
 	rand.Seed(time.Now().UnixNano())
