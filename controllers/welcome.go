@@ -6,7 +6,7 @@ import (
 )
 
 // WelcomeGet just returns a hello message.
-func WelcomeGet(w http.ResponseWriter, r *http.Request) {
+func Welcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	response := "{ \"response\":\"Hello World.\" }"
 	fmt.Fprint(w, response)

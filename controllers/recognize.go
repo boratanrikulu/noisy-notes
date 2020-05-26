@@ -18,7 +18,7 @@ import (
 // The file must be named as "noise".
 // The size limit of the file is 10 mb.
 // The file must be an "audio/mpeg".
-func RecognizePost(w http.ResponseWriter, r *http.Request) {
+func Recognize(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(1 << 20) // 10 MB size limit
 	noise, _, err := r.FormFile("noise")
 	if err != nil {

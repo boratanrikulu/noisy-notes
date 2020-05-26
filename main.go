@@ -33,8 +33,10 @@ func init() {
 func main() {
 	// TODO move route to a separated package.
 	r := mux.NewRouter()
-	r.HandleFunc("/", controllers.WelcomeGet).Methods("GET")
-	r.HandleFunc("/recognize", controllers.RecognizePost).Methods("POST")
+	r.HandleFunc("/", controllers.Welcome).Methods("GET")
+	r.HandleFunc("/recognize", controllers.Recognize).Methods("POST")
+	r.HandleFunc("/users", controllers.SignUp).Methods("POST")
+	r.HandleFunc("/sessions", controllers.Login).Methods("POST")
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), r)
 }
