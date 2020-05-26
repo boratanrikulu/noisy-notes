@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/boratanrikulu/noisy-notes/notes"
+	"github.com/boratanrikulu/noisy-notes/noises"
 )
 
 // RecognizePost gets a file from the response.
@@ -38,7 +38,7 @@ func RecognizePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := notes.Recognize(b.Bytes())
+	resp, err := noises.Recognize(b.Bytes())
 	if err != nil {
 		fmt.Fprint(w, err)
 		return

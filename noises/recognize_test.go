@@ -1,4 +1,4 @@
-package notes
+package noises
 
 import (
 	"fmt"
@@ -19,6 +19,6 @@ func TestRecognize(t *testing.T) {
 
 	fmt.Println("Resp:", resp)
 	if resp != "Tavşan ile kuşun macerası" {
-		t.Fatal("Ses eşleşmedi.")
+		t.Fatal("Recognition is wrong.")
 	}
 }
