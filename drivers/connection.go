@@ -28,7 +28,7 @@ func DBConnect() (*gorm.DB, error) {
 }
 
 // RedisConnect returens redis connection that is defient at the env file.
-func RedisConnect() (*redis.Conn, error) {
+func RedisConnect() (redis.Conn, error) {
 	conn, err := redis.Dial("tcp",
 		os.Getenv("REDIS_URL"),
 		redis.DialClientName(os.Getenv("REDIS_CLIENTNAME")),
@@ -38,5 +38,5 @@ func RedisConnect() (*redis.Conn, error) {
 		return nil, err
 	}
 
-	return &conn, nil
+	return conn, nil
 }

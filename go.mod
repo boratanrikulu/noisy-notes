@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.57.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gomodule/redigo v1.8.1
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.4
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0

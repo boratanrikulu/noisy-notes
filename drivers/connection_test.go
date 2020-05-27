@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// init set env keys.
 func init() {
 	err := godotenv.Load("../.env")
 	if err != nil {

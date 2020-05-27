@@ -13,6 +13,7 @@ import (
 	"github.com/boratanrikulu/noisy-notes/models"
 )
 
+// init sets env keys, set db and redis connection and makes migrations.
 func init() {
 	// Set env keys.
 	err := godotenv.Load()
@@ -22,6 +23,12 @@ func init() {
 
 	// Set database connection.
 	models.DB, err = drivers.DBConnect()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Set redis connection.
+	models.R, err = drivers.RedisConnect()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,6 +43,7 @@ func init() {
 func main() {
 	// TODO move route to a separated package.
 	r := mux.NewRouter()
+
 	r.HandleFunc("/", controllers.Welcome).Methods("GET")
 	r.HandleFunc("/recognize", controllers.Recognize).Methods("POST")
 	r.HandleFunc("/users", controllers.SignUp).Methods("POST")

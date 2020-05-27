@@ -30,7 +30,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	password := r.PostFormValue("password")
 
-	err := models.Login(username, password)
+	token, err := models.Login(username, password)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
 		fmt.Fprint(w, err)
@@ -38,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusAccepted)
-	fmt.Fprint(w, "Login is successful.")
+	fmt.Fprintf(w, "Login is successful. Token: %v", token)
 }
 
 // Delete deletes the account.
