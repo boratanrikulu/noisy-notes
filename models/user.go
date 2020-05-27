@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -45,19 +46,50 @@ func SignUp(username string, password string) error {
 
 // Login checks the db with given username and password.
 // Returns a result by checking if the user exist.
-func Login(username string, password string) error {
+func Login(username string, password string) (string, error) {
 	user := User{}
+
+	// Get the user from the DB.
 	db := DB.Where("username = ?", username).First(&user)
 	if err := db.Error; err != nil {
-		return fmt.Errorf("There is no user that named: %v", username)
+		return "", fmt.Errorf("The user is not exist: %v", username)
 	}
 
+	// Check the if password is correct.
 	err := bcrypt.CompareHashAndPassword(user.Password, []byte(password))
 	if err != nil {
-		return fmt.Errorf("Password is wrong.")
+		return "", fmt.Errorf("Password is not correct.")
 	}
 
-	return nil
+	// Create a session that lives for 1 hour.
+	// key: token, value: username.
+	token := uuid.New().String()
+	_, err = R.Do("SETEX", token, 3600, username)
+	if err != nil {
+		return "", fmt.Errorf("Error occur while creating session: %v", err)
+	}
+
+	// Return the token.
+	return token, nil
+}
+
+// CurrentUser returns the current user that matches with the token.
+func CurrentUser(token string) (User, error) {
+	currentUser := User{}
+
+	// Get the username if redis has the token.
+	resp, err := R.Do("GET", token)
+	if err != nil || resp == nil || resp == "" {
+		return currentUser, fmt.Errorf("There is an error with the token: %v", err)
+	}
+
+	// There is an username. Take the user object from the DB.
+	db := DB.Where("username = ?", resp).First(&currentUser)
+	if err := db.Error; err != nil {
+		return currentUser, fmt.Errorf("The user is not exist: %v", err)
+	}
+
+	return currentUser, nil
 }
 
 // DeleteAccount deletes the user.

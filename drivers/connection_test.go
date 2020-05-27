@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// init set env keys.
 func init() {
 	err := godotenv.Load("../.env")
 	if err != nil {
@@ -14,8 +15,14 @@ func init() {
 	}
 }
 
-func TestConnect(t *testing.T) {
-	if got := Connect(); got == nil {
-		t.Fatal("Connection is not set..")
+func TestDBConnect(t *testing.T) {
+	if _, err := DBConnect(); err != nil {
+		t.Fatalf("DB connection is failed: %v", err)
+	}
+}
+
+func TestRedisConnect(t *testing.T) {
+	if _, err := RedisConnect(); err != nil {
+		t.Fatalf("Redis connection is failed: %v", err)
 	}
 }
