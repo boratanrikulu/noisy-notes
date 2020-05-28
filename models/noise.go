@@ -15,6 +15,20 @@ type Noise struct {
 	Tags        []Tag  `gorm:"foreignkey:NoiseRefer;association_foreignkey:ID"`
 }
 
+func NoiseIndex(user User) ([]Noise, error) {
+	noises := []Noise{}
+	db := DB.Order("created_at desc").
+		Model(&user).
+		Association("Noises").
+		Find(&noises)
+
+	if err := db.Error; err != nil {
+		return nil, err
+	}
+
+	return noises, nil
+}
+
 // NoiseCreate creates a noise for the user.
 func NoiseCreate(user User, title string) (Noise, error) {
 	noise := Noise{

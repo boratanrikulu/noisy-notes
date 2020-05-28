@@ -81,21 +81,24 @@ func Login(username string, password string) (string, error) {
 
 // CurrentUser returns the current user that matches with the token.
 func CurrentUser(token string) (User, error) {
-	currentUser := User{}
+	user := User{}
 
 	// Get the username if redis has the token.
 	resp, err := R.Do("GET", token)
 	if err != nil || resp == nil || resp == "" {
-		return currentUser, fmt.Errorf("There is an error with the token: %v", err)
+		return user, fmt.Errorf("There is an error with the token")
 	}
 
 	// There is an username. Take the user object from the DB.
-	db := DB.Where("username = ?", resp).First(&currentUser)
+	db := DB.Where("username = ?", resp).First(&user)
 	if err := db.Error; err != nil {
-		return currentUser, fmt.Errorf("The user is not exist: %v", err)
+		return user, fmt.Errorf("The user is not exist: %v", err)
 	}
 
-	return currentUser, nil
+	// Remove hashed password info from the model.
+	user.Password = nil
+
+	return user, nil
 }
 
 // DeleteAccount deletes the user.

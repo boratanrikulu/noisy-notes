@@ -52,8 +52,8 @@ func main() {
 	user.HandleFunc("/signup", controllers.SignUp).Methods("POST")
 
 	noises := user.PathPrefix("/noises").Subrouter()
-	noises.HandleFunc("/", controllers.NoiseIndex).Methods("GET")
-	noises.HandleFunc("/", controllers.NoiseCreate).Methods("POST")
+	noises.HandleFunc("", controllers.NoiseIndex).Methods("GET")
+	noises.HandleFunc("", controllers.NoiseCreate).Methods("POST")
 	noises.HandleFunc("/{id}", controllers.NoiseShow).Methods("GET")
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), r)
