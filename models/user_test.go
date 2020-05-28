@@ -12,6 +12,8 @@ import (
 )
 
 var (
+	name     string
+	surname  string
 	username string
 	password string
 	token    string
@@ -38,13 +40,15 @@ func init() {
 
 	// Set the user info to use in testing.
 	rand.Seed(time.Now().UnixNano())
+	name = randomString(8)
+	surname = randomString(8)
 	username = randomString(8)
 	password = randomString(12)
 }
 
 // TestSignUp creates an account.
 func TestSignUp(t *testing.T) {
-	err := SignUp(username, password)
+	err := SignUp(name, surname, username, password)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
@@ -87,16 +91,7 @@ func TestCurrentUserWithWrongToken(t *testing.T) {
 // TestDuplicatedUsernames creates two account with the same username.
 // It expect an error from the database.
 func TestDuplicatedUsernames(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
-	username := randomString(8)
-	password := randomString(12)
-
-	err := SignUp(username, password)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
-
-	err = SignUp(username, password)
+	err := SignUp(name, surname, username, password)
 	if err == nil {
 		t.Fatalf(err.Error())
 	}

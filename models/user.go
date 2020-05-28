@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
@@ -11,6 +12,8 @@ import (
 // User model.
 type User struct {
 	gorm.Model
+	Name     string  `gorm:"not null"`
+	Surname  string  `gorm:"not null"`
 	Username string  `gorm:"unique;unique_index;not null"`
 	Password []byte  `gorm:"not null"`
 	Noises   []Noise `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
@@ -18,8 +21,8 @@ type User struct {
 
 // SignUp create users by using username and password.
 // Password is hashed by using  bcrypt package.
-func SignUp(username string, password string) error {
-	err := checkInfo(username, password)
+func SignUp(name string, surname string, username string, password string) error {
+	err := checkInfo(name, surname, username, password)
 	if err != nil {
 		return err
 	}
@@ -32,6 +35,8 @@ func SignUp(username string, password string) error {
 
 	// Create user model.
 	user := User{
+		Name:     name,
+		Surname:  surname,
 		Username: username,
 		Password: hashedPassword,
 	}
@@ -106,7 +111,10 @@ func DeleteAccount(username string) error {
 }
 
 // checkInfo checks if the username and the password is valid.
-func checkInfo(username string, password string) error {
+func checkInfo(name string, surname string, username string, password string) error {
+	if strings.TrimSpace(name) == "" || strings.TrimSpace(surname) == "" {
+		return fmt.Errorf("The name or surname can not be empty")
+	}
 	if len(username) < 3 {
 		return fmt.Errorf("The username length must be at least 3 characters. \"%v\" is invalid", username)
 	}

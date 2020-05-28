@@ -8,14 +8,16 @@ import (
 )
 
 // SignUp creates users
-// Form must contains "username" and "password".
+// Form must contains "name", "surname", "username" and "password".
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
+	name := r.PostFormValue("name")
+	surname := r.PostFormValue("surname")
 	username := r.PostFormValue("username")
 	password := r.PostFormValue("password")
 
-	err := models.SignUp(username, password)
+	err := models.SignUp(name, surname, username, password)
 	if err != nil {
 		// Return 403. There is an issue with creating account.
 		w.WriteHeader(http.StatusForbidden)
