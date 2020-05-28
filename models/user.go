@@ -99,11 +99,18 @@ func CurrentUser(token string) (User, error) {
 }
 
 // DeleteAccount deletes the user.
-func DeleteAccount(username string) error {
-	user := User{}
-	DB.Where("username = ?", username).First(&user)
-
+func DeleteAccount(user User) error {
 	db := DB.Delete(&user)
+	if err := db.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteAccount deletes the user.
+func DeleteAccountPermanently(user User) error {
+	db := DB.Unscoped().Delete(&user)
 	if err := db.Error; err != nil {
 		return err
 	}
