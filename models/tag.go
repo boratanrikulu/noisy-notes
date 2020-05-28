@@ -4,11 +4,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// Noise model.
-type Noise struct {
+// Tag model.
+type Tag struct {
 	gorm.Model
 	Title       string `gorm:"not null"`
 	Author      User   `gorm:"foreignkey:AuthorRefer"`
 	AuthorRefer uint   `gorm:"not null"`
-	Tags        []Tag  `gorm:"foreignkey:NoiseRefer;association_foreignkey:ID"`
+	Noise       Noise  `gorm:"foreignkey:NoiseRefer"`
+	NoiseRefer  uint   `gorm:"not null"`
 }

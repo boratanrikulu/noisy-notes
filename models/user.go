@@ -17,6 +17,7 @@ type User struct {
 	Username string  `gorm:"unique;unique_index;not null"`
 	Password []byte  `gorm:"not null"`
 	Noises   []Noise `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
+	Tags     []Tag   `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
 }
 
 // SignUp create users by using username and password.
