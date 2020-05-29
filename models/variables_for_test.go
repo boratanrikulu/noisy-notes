@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -33,8 +32,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("asdasds")
 
 	// Set redis connection.
 	R, err = drivers.RedisConnect()

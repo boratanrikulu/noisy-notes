@@ -63,11 +63,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Return 202. Login is successful.
 	w.WriteHeader(http.StatusAccepted)
 	_ = json.NewEncoder(w).Encode(struct {
-		Message string
-		Token   string
+		Token     string
+		TokenType string
+		ExpiresIn int
 	}{
-		Message: "Login is successful.",
-		Token:   token,
+		Token:     token,
+		TokenType: "Bearer",
+		ExpiresIn: 3600,
 	})
 }
 
