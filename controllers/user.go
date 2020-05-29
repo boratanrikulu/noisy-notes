@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/boratanrikulu/noisy-notes/models"
 )
@@ -35,28 +34,10 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 	_ = json.NewEncoder(w).Encode(struct {
 		Message string
-		User    struct {
-			ID        uint
-			CreatedAt time.Time
-			Name      string
-			Surname   string
-			Username  string
-		}
+		User    models.User
 	}{
 		Message: "Account is created.",
-		User: struct {
-			ID        uint
-			CreatedAt time.Time
-			Name      string
-			Surname   string
-			Username  string
-		}{
-			ID:        user.ID,
-			CreatedAt: user.CreatedAt,
-			Name:      user.Name,
-			Surname:   user.Surname,
-			Username:  user.Username,
-		},
+		User:    user,
 	})
 }
 

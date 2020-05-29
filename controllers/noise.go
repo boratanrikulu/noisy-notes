@@ -11,7 +11,7 @@ import (
 func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	err := CurrentUser.SetNoises()
+	noises, err := CurrentUser.GetNoises()
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -25,7 +25,7 @@ func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 
 	// Return 200. Noises are listed.
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(CurrentUser)
+	_ = json.NewEncoder(w).Encode(noises)
 }
 
 // NoiseCreate create a noise for the current user.

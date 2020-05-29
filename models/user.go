@@ -15,7 +15,7 @@ type User struct {
 	Name     string  `gorm:"not null"`
 	Surname  string  `gorm:"not null"`
 	Username string  `gorm:"unique;unique_index;not null"`
-	Password []byte  `gorm:"not null"`
+	Password []byte  `gorm:"not null" json:"-"`
 	Noises   []Noise `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
 	Tags     []Tag   `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
 }

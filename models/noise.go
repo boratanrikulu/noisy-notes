@@ -10,13 +10,13 @@ import (
 type Noise struct {
 	gorm.Model
 	Title       string `gorm:"not null"`
-	Author      User   `gorm:"foreignkey:AuthorRefer"`
-	AuthorRefer uint   `gorm:"not null"`
+	Author      User   `gorm:"foreignkey:AuthorRefer" json:"-"`
+	AuthorRefer uint   `gorm:"not null" json:"-"`
 	Tags        []Tag  `gorm:"foreignkey:NoiseRefer;association_foreignkey:ID"`
 }
 
-// SetNoises sets all noises for the user.
-func (user *User) SetNoises() error {
+// GetNoises returns all noises for the user.
+func (user *User) GetNoises() ([]Noise, error) {
 	noises := []Noise{}
 	db := DB.Order("created_at desc").
 		Model(user).
@@ -24,11 +24,10 @@ func (user *User) SetNoises() error {
 		Find(&noises)
 
 	if err := db.Error; err != nil {
-		return err
+		return nil, err
 	}
 
-	user.Noises = noises
-	return nil
+	return noises, nil
 }
 
 // GetNoise returns wanted noise if it is associated with the user.
