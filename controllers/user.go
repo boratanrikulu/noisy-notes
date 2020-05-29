@@ -86,6 +86,29 @@ func Me(w http.ResponseWriter, r *http.Request) {
 
 // Logout removes the sessions of the current user.
 func Logout(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	token, _ := getToken(r)
+
+	err := CurrentUser.Logout(token)
+	if err != nil {
+		// Return 403. There is an issue with the taking token.
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(struct {
+			Error string
+		}{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	// Return 202. The sessions is removed.
+	w.WriteHeader(http.StatusAccepted)
+	_ = json.NewEncoder(w).Encode(struct {
+		Message string
+	}{
+		Message: "Sessions is removed.",
+	})
 }
 
 // Delete deletes the account.

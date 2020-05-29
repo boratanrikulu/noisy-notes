@@ -37,25 +37,34 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// getCurrentUser parses the request to get token.
-// Gets the current user by calling models.CurrentUser.
+// getCurrentUser gets the current user by calling models.CurrentUser.
 func getCurrentUser(r *http.Request) (models.User, error) {
-	headerAuth := r.Header.Get("Authorization")
-	authorization := strings.Split(strings.TrimSpace(headerAuth), " ")
-	if len(authorization) != 2 {
-		return models.User{}, fmt.Errorf("Invalid")
+	token, err := getToken(r)
+	if err != nil {
+		return models.User{}, err
 	}
 
-	authType := authorization[0]
-	if authType != "Bearer" {
-		return models.User{}, fmt.Errorf("Auth token type must be Bearer: %v", authType)
-	}
-
-	token := authorization[1]
 	user, err := models.CurrentUser(token)
 	if err != nil {
 		return models.User{}, err
 	}
 
 	return user, nil
+}
+
+// getToken parses the request to get token.
+func getToken(r *http.Request) (string, error) {
+	headerAuth := r.Header.Get("Authorization")
+	authorization := strings.Split(strings.TrimSpace(headerAuth), " ")
+	if len(authorization) != 2 {
+		return "", fmt.Errorf("Invalid")
+	}
+
+	authType := authorization[0]
+	if authType != "Bearer" {
+		return "", fmt.Errorf("Auth token type must be Bearer: %v", authType)
+	}
+
+	token := authorization[1]
+	return token, nil
 }

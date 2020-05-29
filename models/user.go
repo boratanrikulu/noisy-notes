@@ -79,6 +79,19 @@ func Login(username string, password string) (string, error) {
 	return token, nil
 }
 
+// Logout removes the current user's session.
+func (user *User) Logout(token string) error {
+	_, err := R.Do("DEL", token)
+	if err != nil {
+		return fmt.Errorf("Error occur while deleting the session.")
+	}
+
+	// Clear the current user.
+	user = nil
+
+	return nil
+}
+
 // CurrentUser returns the current user that matches with the token.
 func CurrentUser(token string) (User, error) {
 	user := User{}
@@ -86,7 +99,7 @@ func CurrentUser(token string) (User, error) {
 	// Get the username if redis has the token.
 	resp, err := R.Do("GET", token)
 	if err != nil || resp == nil || resp == "" {
-		return User{}, fmt.Errorf("There is an error with the token")
+		return User{}, fmt.Errorf("Authorization is not permitted.")
 	}
 
 	// There is an username. Take the user object from the DB.

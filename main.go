@@ -52,6 +52,7 @@ func main() {
 	user := r.PathPrefix("/user").Subrouter()
 	user.Use(controllers.UserAuthMiddleware)
 	user.HandleFunc("/me", controllers.Me).Methods("GET")
+	user.HandleFunc("/logout", controllers.Logout).Methods("POST")
 
 	noises := user.PathPrefix("/noises").Subrouter()
 	noises.Use(controllers.UserAuthMiddleware)
