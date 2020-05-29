@@ -1,61 +1,19 @@
 package models
 
 import (
-	"log"
-	"math/rand"
 	"testing"
-	"time"
-
-	"github.com/joho/godotenv"
-
-	"github.com/boratanrikulu/noisy-notes/drivers"
 )
-
-var (
-	name     string
-	surname  string
-	username string
-	password string
-	token    string
-)
-
-// init sets env keys and set db and redis connection..
-func init() {
-	// Set env keys
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	DB, err = drivers.DBConnect()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Set redis connection.
-	R, err = drivers.RedisConnect()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Set the user info to use in testing.
-	rand.Seed(time.Now().UnixNano())
-	name = randomString(8)
-	surname = randomString(8)
-	username = randomString(8)
-	password = randomString(12)
-}
 
 // TestSignUp creates an account.
 func TestSignUp(t *testing.T) {
-	err := SignUp(name, surname, username, password)
+	user, err := SignUp(name, surname, username, password)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
 	t.Log("User is created.")
-	t.Logf("Username: %v", username)
-	t.Logf("Password: %v", password)
+	t.Logf("Username: %v", user.Username)
+	t.Logf("Password: %v", string(user.Password))
 }
 
 // TestLogin logins and takes a token.
@@ -91,30 +49,21 @@ func TestCurrentUserWithWrongToken(t *testing.T) {
 // TestDuplicatedUsernames creates two account with the same username.
 // It expect an error from the database.
 func TestDuplicatedUsernames(t *testing.T) {
-	err := SignUp(name, surname, username, password)
+	_, err := SignUp(name, surname, username, password)
 	if err == nil {
 		t.Fatalf(err.Error())
 	}
 }
 
-// TestDeleteAccount checks the DeleteAccount method,
-// by deleting the user that is created on testing.
-func TestDeleteAccount(t *testing.T) {
-	err := DeleteAccount(username)
+// TestDeleteAccountPermanently deletes testing's user object from DB.
+func TestDeletePermanently(t *testing.T) {
+	user, err := CurrentUser(token)
 	if err != nil {
-		t.Fatal(err.Error())
-	}
-	t.Logf("%v is deleted.", username)
-}
-
-// randomString returns a random word.
-func randomString(n int) string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		t.Fatalf(err.Error())
 	}
 
-	return string(b)
+	err = user.DeletePermanently()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 }

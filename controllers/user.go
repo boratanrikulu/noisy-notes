@@ -17,7 +17,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	password := r.PostFormValue("password")
 
-	err := models.SignUp(name, surname, username, password)
+	user, err := models.SignUp(name, surname, username, password)
 	if err != nil {
 		// Return 403. There is an issue with creating account.
 		w.WriteHeader(http.StatusForbidden)
@@ -34,8 +34,10 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 	_ = json.NewEncoder(w).Encode(struct {
 		Message string
+		User    models.User
 	}{
 		Message: "Account is created.",
+		User:    user,
 	})
 }
 
@@ -63,11 +65,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Return 202. Login is successful.
 	w.WriteHeader(http.StatusAccepted)
 	_ = json.NewEncoder(w).Encode(struct {
-		Message string
-		Token   string
+		Token     string
+		TokenType string
+		ExpiresIn int
 	}{
-		Message: "Login is successful.",
-		Token:   token,
+		Token:     token,
+		TokenType: "Bearer",
+		ExpiresIn: 3600,
 	})
 }
 

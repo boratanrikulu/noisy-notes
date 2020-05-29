@@ -15,22 +15,23 @@ type User struct {
 	Name     string  `gorm:"not null"`
 	Surname  string  `gorm:"not null"`
 	Username string  `gorm:"unique;unique_index;not null"`
-	Password []byte  `gorm:"not null"`
+	Password []byte  `gorm:"not null" json:"-"`
 	Noises   []Noise `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
+	Tags     []Tag   `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
 }
 
-// SignUp create users by using username and password.
+// SignUp creates users by using username and password.
 // Password is hashed by using  bcrypt package.
-func SignUp(name string, surname string, username string, password string) error {
+func SignUp(name string, surname string, username string, password string) (User, error) {
 	err := checkInfo(name, surname, username, password)
 	if err != nil {
-		return err
+		return User{}, err
 	}
 
 	// Create hashed password.
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return User{}, err
 	}
 
 	// Create user model.
@@ -43,10 +44,10 @@ func SignUp(name string, surname string, username string, password string) error
 
 	db := DB.Create(&user)
 	if err := db.Error; err != nil {
-		return fmt.Errorf("Error occur while creating the account: %v", err)
+		return User{}, fmt.Errorf("Error occur while creating the account: %v", err)
 	}
 
-	return nil
+	return user, nil
 }
 
 // Login checks the db with given username and password.
@@ -80,29 +81,39 @@ func Login(username string, password string) (string, error) {
 
 // CurrentUser returns the current user that matches with the token.
 func CurrentUser(token string) (User, error) {
-	currentUser := User{}
+	user := User{}
 
 	// Get the username if redis has the token.
 	resp, err := R.Do("GET", token)
 	if err != nil || resp == nil || resp == "" {
-		return currentUser, fmt.Errorf("There is an error with the token: %v", err)
+		return User{}, fmt.Errorf("There is an error with the token")
 	}
 
 	// There is an username. Take the user object from the DB.
-	db := DB.Where("username = ?", resp).First(&currentUser)
+	db := DB.Where("username = ?", resp).First(&user)
 	if err := db.Error; err != nil {
-		return currentUser, fmt.Errorf("The user is not exist: %v", err)
+		return User{}, fmt.Errorf("The user is not exist: %v", err)
 	}
 
-	return currentUser, nil
+	// Remove hashed password info from the model.
+	user.Password = nil
+
+	return user, nil
 }
 
-// DeleteAccount deletes the user.
-func DeleteAccount(username string) error {
-	user := User{}
-	DB.Where("username = ?", username).First(&user)
+// Delete deletes the user.
+func (user *User) Delete() error {
+	db := DB.Delete(user)
+	if err := db.Error; err != nil {
+		return err
+	}
 
-	db := DB.Delete(&user)
+	return nil
+}
+
+// DeletePermanently deletes the user.
+func (user *User) DeletePermanently() error {
+	db := DB.Unscoped().Delete(user)
 	if err := db.Error; err != nil {
 		return err
 	}

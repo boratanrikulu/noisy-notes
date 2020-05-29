@@ -46,8 +46,16 @@ func main() {
 
 	r.HandleFunc("/", controllers.Welcome).Methods("GET")
 	r.HandleFunc("/recognize", controllers.Recognize).Methods("POST")
-	r.HandleFunc("/users", controllers.SignUp).Methods("POST")
-	r.HandleFunc("/sessions", controllers.Login).Methods("POST")
+
+	user := r.PathPrefix("/users").Subrouter()
+	user.HandleFunc("/login", controllers.Login).Methods("POST")
+	user.HandleFunc("/signup", controllers.SignUp).Methods("POST")
+
+	noises := user.PathPrefix("/noises").Subrouter()
+	noises.Use(controllers.UserAuthMiddleware)
+	noises.HandleFunc("", controllers.NoiseIndex).Methods("GET")
+	noises.HandleFunc("", controllers.NoiseCreate).Methods("POST")
+	noises.HandleFunc("/{id}", controllers.NoiseShow).Methods("GET")
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), r)
 }
