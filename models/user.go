@@ -22,16 +22,16 @@ type User struct {
 
 // SignUp create users by using username and password.
 // Password is hashed by using  bcrypt package.
-func SignUp(name string, surname string, username string, password string) error {
+func SignUp(name string, surname string, username string, password string) (User, error) {
 	err := checkInfo(name, surname, username, password)
 	if err != nil {
-		return err
+		return User{}, err
 	}
 
 	// Create hashed password.
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return User{}, err
 	}
 
 	// Create user model.
@@ -44,10 +44,10 @@ func SignUp(name string, surname string, username string, password string) error
 
 	db := DB.Create(&user)
 	if err := db.Error; err != nil {
-		return fmt.Errorf("Error occur while creating the account: %v", err)
+		return User{}, fmt.Errorf("Error occur while creating the account: %v", err)
 	}
 
-	return nil
+	return user, nil
 }
 
 // Login checks the db with given username and password.
@@ -86,13 +86,13 @@ func CurrentUser(token string) (User, error) {
 	// Get the username if redis has the token.
 	resp, err := R.Do("GET", token)
 	if err != nil || resp == nil || resp == "" {
-		return user, fmt.Errorf("There is an error with the token")
+		return User{}, fmt.Errorf("There is an error with the token")
 	}
 
 	// There is an username. Take the user object from the DB.
 	db := DB.Where("username = ?", resp).First(&user)
 	if err := db.Error; err != nil {
-		return user, fmt.Errorf("The user is not exist: %v", err)
+		return User{}, fmt.Errorf("The user is not exist: %v", err)
 	}
 
 	// Remove hashed password info from the model.
@@ -102,8 +102,8 @@ func CurrentUser(token string) (User, error) {
 }
 
 // DeleteAccount deletes the user.
-func DeleteAccount(user User) error {
-	db := DB.Delete(&user)
+func (user *User) Delete() error {
+	db := DB.Delete(user)
 	if err := db.Error; err != nil {
 		return err
 	}
@@ -112,8 +112,8 @@ func DeleteAccount(user User) error {
 }
 
 // DeleteAccount deletes the user.
-func DeleteAccountPermanently(user User) error {
-	db := DB.Unscoped().Delete(&user)
+func (user *User) DeletePermanently() error {
+	db := DB.Unscoped().Delete(user)
 	if err := db.Error; err != nil {
 		return err
 	}

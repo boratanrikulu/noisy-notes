@@ -6,14 +6,14 @@ import (
 
 // TestSignUp creates an account.
 func TestSignUp(t *testing.T) {
-	err := SignUp(name, surname, username, password)
+	user, err := SignUp(name, surname, username, password)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
 	t.Log("User is created.")
-	t.Logf("Username: %v", username)
-	t.Logf("Password: %v", password)
+	t.Logf("Username: %v", user.Username)
+	t.Logf("Password: %v", string(user.Password))
 }
 
 // TestLogin logins and takes a token.
@@ -49,20 +49,20 @@ func TestCurrentUserWithWrongToken(t *testing.T) {
 // TestDuplicatedUsernames creates two account with the same username.
 // It expect an error from the database.
 func TestDuplicatedUsernames(t *testing.T) {
-	err := SignUp(name, surname, username, password)
+	_, err := SignUp(name, surname, username, password)
 	if err == nil {
 		t.Fatalf(err.Error())
 	}
 }
 
 // TestDeleteAccountPermanently deletes testing's user object from DB.
-func TestDeleteAccountPermanently(t *testing.T) {
+func TestDeletePermanently(t *testing.T) {
 	user, err := CurrentUser(token)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	err = DeleteAccountPermanently(user)
+	err = user.DeletePermanently()
 	if err != nil {
 		t.Fatalf(err.Error())
 	}

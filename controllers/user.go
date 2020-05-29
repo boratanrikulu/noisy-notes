@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/boratanrikulu/noisy-notes/models"
 )
@@ -17,7 +18,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	password := r.PostFormValue("password")
 
-	err := models.SignUp(name, surname, username, password)
+	user, err := models.SignUp(name, surname, username, password)
 	if err != nil {
 		// Return 403. There is an issue with creating account.
 		w.WriteHeader(http.StatusForbidden)
@@ -34,8 +35,28 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 	_ = json.NewEncoder(w).Encode(struct {
 		Message string
+		User    struct {
+			ID        uint
+			CreatedAt time.Time
+			Name      string
+			Surname   string
+			Username  string
+		}
 	}{
 		Message: "Account is created.",
+		User: struct {
+			ID        uint
+			CreatedAt time.Time
+			Name      string
+			Surname   string
+			Username  string
+		}{
+			ID:        user.ID,
+			CreatedAt: user.CreatedAt,
+			Name:      user.Name,
+			Surname:   user.Surname,
+			Username:  user.Username,
+		},
 	})
 }
 

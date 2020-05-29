@@ -8,13 +8,13 @@ import (
 // Creates a noise for the user.
 // Removes the noise, removes the user.
 func TestNoiseCreate(t *testing.T) {
-	err := SignUp(name, surname, username, password)
+	user, err := SignUp(name, surname, username, password)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 	t.Log("User is created.")
-	t.Logf("Username: %v", username)
-	t.Logf("Password: %v", password)
+	t.Logf("Username: %v", user.Username)
+	t.Logf("Password: %v", string(user.Password))
 
 	token, err := Login(username, password)
 	if err != nil {
@@ -22,25 +22,25 @@ func TestNoiseCreate(t *testing.T) {
 	}
 	t.Logf("Login is successful: %v", token)
 
-	user, err := CurrentUser(token)
+	user, err = CurrentUser(token)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 	t.Logf("Current user: %v", user.Username)
 
-	noise, err := NoiseCreate(user, title)
+	noise, err := user.NoiseCreate(title)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 	t.Logf("Noise is created: %v", noise.Title)
 
-	err = NoiseDeletePermanently(noise)
+	err = noise.DeletePermanently()
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 	t.Logf("The noise is deleted.")
 
-	err = DeleteAccountPermanently(user)
+	err = user.DeletePermanently()
 	if err != nil {
 		t.Fatalf(err.Error())
 	}

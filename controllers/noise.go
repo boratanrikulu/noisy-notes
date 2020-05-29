@@ -3,14 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/boratanrikulu/noisy-notes/models"
 )
 
 func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	noises, err := models.NoiseIndex(CurrentUser)
+	err := CurrentUser.SetNoises()
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -24,14 +22,14 @@ func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 
 	// Return 200. Noises are listed.
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(noises)
+	_ = json.NewEncoder(w).Encode(CurrentUser)
 }
 
 func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	title := r.PostFormValue("title")
-	noise, err := models.NoiseCreate(CurrentUser, title)
+	noise, err := CurrentUser.NoiseCreate(title)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
