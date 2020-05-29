@@ -20,7 +20,7 @@ type User struct {
 	Tags     []Tag   `gorm:"foreignkey:AuthorRefer;association_foreignkey:ID"`
 }
 
-// SignUp create users by using username and password.
+// SignUp creates users by using username and password.
 // Password is hashed by using  bcrypt package.
 func SignUp(name string, surname string, username string, password string) (User, error) {
 	err := checkInfo(name, surname, username, password)
@@ -101,7 +101,7 @@ func CurrentUser(token string) (User, error) {
 	return user, nil
 }
 
-// DeleteAccount deletes the user.
+// Delete deletes the user.
 func (user *User) Delete() error {
 	db := DB.Delete(user)
 	if err := db.Error; err != nil {
@@ -111,7 +111,7 @@ func (user *User) Delete() error {
 	return nil
 }
 
-// DeleteAccount deletes the user.
+// DeletePermanently deletes the user.
 func (user *User) DeletePermanently() error {
 	db := DB.Unscoped().Delete(user)
 	if err := db.Error; err != nil {

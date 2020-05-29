@@ -15,6 +15,7 @@ type Noise struct {
 	Tags        []Tag  `gorm:"foreignkey:NoiseRefer;association_foreignkey:ID"`
 }
 
+// SetNoises sets all noises for the user.
 func (user *User) SetNoises() error {
 	noises := []Noise{}
 	db := DB.Order("created_at desc").
@@ -28,6 +29,21 @@ func (user *User) SetNoises() error {
 
 	user.Noises = noises
 	return nil
+}
+
+// GetNoise returns wanted noise if it is associated with the user.
+func (user *User) GetNoise(id string) (Noise, error) {
+	noise := Noise{}
+	db := DB.Where("id = ?", id).
+		Model(user).
+		Association("Noises").
+		Find(&noise)
+
+	if err := db.Error; err != nil {
+		return Noise{}, err
+	}
+
+	return noise, nil
 }
 
 // NoiseCreate creates a noise for the user.
@@ -45,7 +61,7 @@ func (user *User) NoiseCreate(title string) (Noise, error) {
 	return noise, nil
 }
 
-// NoiseDelete deletes the noise.
+// Delete deletes the noise.
 func (noise *Noise) Delete() error {
 	db := DB.Delete(noise)
 	if err := db.Error; err != nil {
@@ -55,7 +71,7 @@ func (noise *Noise) Delete() error {
 	return nil
 }
 
-// NoiseDeletePermanently deletes the noise permanently.
+// DeletePermanently deletes the noise permanently.
 func (noise *Noise) DeletePermanently() error {
 	db := DB.Unscoped().Delete(noise)
 	if err := db.Error; err != nil {
