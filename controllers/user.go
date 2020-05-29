@@ -75,6 +75,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Me returns current user's info.
+func Me(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	// Return 200. Current user is listed.
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(CurrentUser)
+}
+
+// Logout removes the sessions of the current user.
+func Logout(w http.ResponseWriter, r *http.Request) {
+}
+
 // Delete deletes the account.
 func Delete(w http.ResponseWriter, r *http.Request) {
 }

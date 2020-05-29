@@ -45,11 +45,13 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", controllers.Welcome).Methods("GET")
-	r.HandleFunc("/recognize", controllers.Recognize).Methods("POST")
 
-	user := r.PathPrefix("/users").Subrouter()
-	user.HandleFunc("/login", controllers.Login).Methods("POST")
-	user.HandleFunc("/signup", controllers.SignUp).Methods("POST")
+	r.HandleFunc("/login", controllers.Login).Methods("POST")
+	r.HandleFunc("/signup", controllers.SignUp).Methods("POST")
+
+	user := r.PathPrefix("/user").Subrouter()
+	user.Use(controllers.UserAuthMiddleware)
+	user.HandleFunc("/me", controllers.Me).Methods("GET")
 
 	noises := user.PathPrefix("/noises").Subrouter()
 	noises.Use(controllers.UserAuthMiddleware)
