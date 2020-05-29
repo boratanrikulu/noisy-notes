@@ -9,23 +9,32 @@ import (
 	"github.com/boratanrikulu/noisy-notes/models"
 )
 
-// CurrentUser calls the getCurrentUser to get current user.
-// Returns 401 if there is no current user.
-func CurrentUser(w http.ResponseWriter, r *http.Request) (models.User, error) {
-	user, err := getCurrentUser(r)
+var (
+	CurrentUser models.User
+)
 
-	if err != nil {
-		// Return 401. There is an issue with gettin current user.
-		w.WriteHeader(http.StatusUnauthorized)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
-		return user, err
-	}
+// UserAuthMiddleware returns a middleware.
+// That middleware check if the user's token is valid.
+func UserAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, err := getCurrentUser(r)
 
-	return user, nil
+		if err != nil {
+			// Return 401. There is an issue with gettin current user.
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(http.StatusUnauthorized)
+			_ = json.NewEncoder(w).Encode(struct {
+				Error string
+			}{
+				Error: err.Error(),
+			})
+			return
+		}
+
+		// Set current user and call the method.
+		CurrentUser = user
+		next.ServeHTTP(w, r)
+	})
 }
 
 // getCurrentUser parses the request to get token.

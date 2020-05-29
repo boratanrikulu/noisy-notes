@@ -10,12 +10,7 @@ import (
 func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	user, err := CurrentUser(w, r)
-	if err != nil {
-		return
-	}
-
-	noises, err := models.NoiseIndex(user)
+	noises, err := models.NoiseIndex(CurrentUser)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -35,13 +30,8 @@ func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	user, err := CurrentUser(w, r)
-	if err != nil {
-		return
-	}
-
 	title := r.PostFormValue("title")
-	noise, err := models.NoiseCreate(user, title)
+	noise, err := models.NoiseCreate(CurrentUser, title)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
