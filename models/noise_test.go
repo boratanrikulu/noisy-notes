@@ -1,6 +1,7 @@
 package models
 
 import (
+	"io/ioutil"
 	"testing"
 )
 
@@ -28,11 +29,17 @@ func TestNoiseCreate(t *testing.T) {
 	}
 	t.Logf("Current user: %v", user.Username)
 
-	noise, err := user.NoiseCreate(title)
+	data, err := ioutil.ReadFile("../noises/audio_test.mp3")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	noise, err := user.NoiseCreate(title, data)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 	t.Logf("Noise is created: %v", noise.Title)
+	t.Logf("Noise's text: %v", noise.Text)
 
 	err = noise.DeletePermanently()
 	if err != nil {

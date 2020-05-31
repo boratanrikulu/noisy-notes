@@ -36,7 +36,7 @@ func init() {
 	// Make migrations from the schema file.
 	db := models.Migrate()
 	if err = db.Error; err != nil {
-		log.Fatal("Migration is not successful: %v", err)
+		log.Fatal("Migration is not successful")
 	}
 }
 
@@ -55,10 +55,10 @@ func main() {
 	user.HandleFunc("/logout", controllers.Logout).Methods("POST")
 
 	noises := user.PathPrefix("/noises").Subrouter()
-	noises.Use(controllers.UserAuthMiddleware)
 	noises.HandleFunc("", controllers.NoiseIndex).Methods("GET")
 	noises.HandleFunc("", controllers.NoiseCreate).Methods("POST")
 	noises.HandleFunc("/{id}", controllers.NoiseShow).Methods("GET")
+	noises.HandleFunc("/{id}/file", controllers.NoiseFileShow).Methods("GET")
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), r)
 }

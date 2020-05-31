@@ -108,9 +108,6 @@ func CurrentUser(token string) (User, error) {
 		return User{}, fmt.Errorf("The user is not exist: %v", err)
 	}
 
-	// Remove hashed password info from the model.
-	user.Password = nil
-
 	return user, nil
 }
 

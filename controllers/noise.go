@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -29,12 +33,24 @@ func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 // NoiseCreate create a noise for the current user.
-// Form must contain "title".
+// Form must contains "title" and "file".
 func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
+	b, err := getNoiseFile(r)
+	if err != nil {
+		// Return 403. There is an issue with getting noise file.
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(struct {
+			Error string
+		}{
+			Error: err.Error(),
+		})
+		return
+	}
+
 	title := r.PostFormValue("title")
-	noise, err := CurrentUser.NoiseCreate(title)
+	noise, err := CurrentUser.NoiseCreate(title, b.Bytes())
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -51,6 +67,8 @@ func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(noise)
 }
 
+// NoiseShow returns the noise.
+// There must be an {id} parameter.
 func NoiseShow(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -72,4 +90,73 @@ func NoiseShow(w http.ResponseWriter, r *http.Request) {
 	// Return 200. Noise is listed.
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(noise)
+}
+
+// NoiseFileShow returns the noise's file.
+// There must be an {id} parameter.
+func NoiseFileShow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	noise, err := CurrentUser.GetNoiseWithFile(id)
+	if err != nil {
+		// Return 403. There is an issue with creating noise.
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(struct {
+			Error string
+		}{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	resp := bytes.NewReader(noise.File.Data)
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%v.mp3\"", noise.Title))
+	w.Header().Set("Content-Type", "audio/mpeg;")
+
+	io.Copy(w, resp)
+}
+
+// getNoiseFile returns a buffer for the file from the request.
+func getNoiseFile(r *http.Request) (*bytes.Buffer, error) {
+	// Set file
+	r.ParseMultipartForm(1 << 20) // 10 MB size limit
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var b bytes.Buffer
+	io.Copy(&b, file)
+
+	// Check the format.
+	err = checkMime(b.Bytes())
+	if err != nil {
+		return nil, err
+	}
+
+	return &b, nil
+}
+
+// checkMime checks if the file's mime is allowed.
+func checkMime(b []byte) error {
+	allowed := []string{"audio/mpeg"}
+	mime := http.DetectContentType(b)
+	if contains(allowed, mime) {
+		return nil
+	}
+	return fmt.Errorf("Not allowed format: %v\nPlease upload one of the this formats: %v",
+		mime, strings.Join(allowed, ", "))
+}
+
+// contains tells whether a contains x.
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
 }

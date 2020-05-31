@@ -12,5 +12,5 @@ var R redis.Conn
 
 // Migrate makes migrations by using gorm.
 func Migrate() *gorm.DB {
-	return DB.AutoMigrate(&User{}, &Noise{})
+	return DB.AutoMigrate(&User{}, &Noise{}, &NoiseFile{}, &Tag{})
 }
