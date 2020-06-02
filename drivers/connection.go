@@ -3,6 +3,7 @@ package drivers
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
@@ -21,16 +22,11 @@ func DBConnect() (*gorm.DB, error) {
 	return db, nil
 }
 
-// RedisConnect returns redis connection that is defiend at the env file.
-func RedisConnect() (redis.Conn, error) {
-	conn, err := redis.Dial("tcp",
-		os.Getenv("REDIS_URL"),
-		redis.DialClientName(os.Getenv("REDIS_CLIENTNAME")),
-		redis.DialPassword(os.Getenv("REDIS_PASSWORD")))
-
-	if err != nil {
-		return nil, err
+// RedisPool returns a pool for Redis.
+func RedisPool() *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 140 * time.Second,
+		Dial:        func() (redis.Conn, error) { return redis.DialURL(os.Getenv("REDIS_URL")) },
 	}
-
-	return conn, nil
 }

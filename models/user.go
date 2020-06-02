@@ -67,6 +67,10 @@ func Login(username string, password string) (string, error) {
 		return "", fmt.Errorf("Password is not correct.")
 	}
 
+	// Get Redis conn
+	R := RPOOL.Get()
+	defer R.Close()
+
 	// Create a session that lives for 1 hour.
 	// key: token, value: username.
 	token := uuid.New().String()
@@ -81,6 +85,10 @@ func Login(username string, password string) (string, error) {
 
 // Logout removes the current user's session.
 func (user *User) Logout(token string) error {
+	// Get Redis conn
+	R := RPOOL.Get()
+	defer R.Close()
+
 	_, err := R.Do("DEL", token)
 	if err != nil {
 		return fmt.Errorf("Error occur while deleting the session.")
@@ -94,6 +102,11 @@ func (user *User) Logout(token string) error {
 
 // CurrentUser returns the current user that matches with the token.
 func CurrentUser(token string) (User, error) {
+	// Get Redis conn
+	R := RPOOL.Get()
+	defer R.Close()
+
+	// User model.
 	user := User{}
 
 	// Get the username if redis has the token.

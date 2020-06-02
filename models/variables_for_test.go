@@ -34,7 +34,7 @@ func init() {
 	}
 
 	// Set redis connection.
-	R, err = drivers.RedisConnect()
+	RPOOL = drivers.RedisPool()
 	if err != nil {
 		log.Fatal(err)
 	}

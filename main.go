@@ -18,7 +18,7 @@ func init() {
 	// Set env keys.
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	// Set database connection.
@@ -28,7 +28,7 @@ func init() {
 	}
 
 	// Set redis connection.
-	models.R, err = drivers.RedisConnect()
+	models.RPOOL = drivers.RedisPool()
 	if err != nil {
 		log.Fatal(err)
 	}
