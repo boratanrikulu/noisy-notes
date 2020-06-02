@@ -11,13 +11,7 @@ import (
 
 // DBConnect returns a connection between PostgreSQL database that is defined at the env file.
 func DBConnect() (*gorm.DB, error) {
-	dbinfo := fmt.Sprintf("host=%v port=%v user=%v password=%v, dbname=%v sslmode=%v",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_SSLMODE"))
+	dbinfo := fmt.Sprintf(os.Getenv("DATABASE_URL"))
 
 	db, err := gorm.Open("postgres", dbinfo)
 	if err != nil {
