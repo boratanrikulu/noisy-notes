@@ -12,13 +12,24 @@ func TestRecognize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	resp, err := Recognize(data)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// result channel
+	c := make(chan string)
+	// error channel
+	e := make(chan error)
 
-	fmt.Println("Resp:", resp)
-	if resp != "Tavşan ile kuşun macerası" {
-		t.Fatal("Recognition is wrong.")
+	go Recognize(data, c, e)
+
+	select {
+	case err := <-e:
+		close(c)
+		close(e)
+		t.Fatal(err.Error())
+	case text := <-c:
+		close(c)
+		close(e)
+		fmt.Println("Resp:", text)
+		if text != "Tavşan ile kuşun macerası" {
+			t.Fatal("Recognition is wrong.")
+		}
 	}
 }
