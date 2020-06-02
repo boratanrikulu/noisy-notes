@@ -21,8 +21,9 @@ func TestDBConnect(t *testing.T) {
 	}
 }
 
-func TestRedisConnect(t *testing.T) {
-	if _, err := RedisConnect(); err != nil {
+func TestRedisPool(t *testing.T) {
+	p := RedisPool()
+	if _, err := p.Dial(); err != nil {
 		t.Fatalf("Redis connection is failed: %v", err)
 	}
 }
