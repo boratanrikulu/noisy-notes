@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// WelcomeGet just returns a hello message.
+// Welcome just returns a hello message.
 func Welcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 

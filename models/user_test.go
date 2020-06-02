@@ -24,7 +24,7 @@ func TestLogin(t *testing.T) {
 	}
 	token = resp
 
-	t.Logf("Login is succesful for: %v", username)
+	t.Logf("Login is successful for: %v", username)
 	t.Logf("Token: %v", token)
 }
 

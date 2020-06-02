@@ -39,7 +39,7 @@ func Recognize(data []byte, c chan<- string, e chan<- error) {
 	})
 
 	// Return an error message if the result is nil.
-	if resp == nil || len(resp.Results) == 0 || len(resp.Results[0].Alternatives) == 0 {
+	if err != nil || resp == nil || len(resp.Results) == 0 || len(resp.Results[0].Alternatives) == 0 {
 		e <- fmt.Errorf("We could not take text from the speech.")
 		return
 	}

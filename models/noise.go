@@ -112,7 +112,7 @@ func (noise *Noise) AfterCreate(scope *gorm.Scope) error {
 	return nil
 }
 
-// setResults set the result that are recived from the channel.
+// setResults set the result that are received from the channel.
 func setResults(DB *gorm.DB, noise *Noise, c chan string, e chan error) {
 	select {
 	case err := <-e:

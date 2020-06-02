@@ -4,6 +4,8 @@
 
 #
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/boratanrikulu/noisy-notes)](https://goreportcard.com/report/github.com/boratanrikulu/noisy-notes)
+
 Noisy Notes lets you **keep your notes with noise.**
 
 Each sent noise is converted to text by using google's speech-to-text api.  
@@ -18,7 +20,7 @@ Noisy Notes gives you this ability.
 
 ## TODOs
 
-> **These project do not have any release yet.**  
+> **This project do not have any release yet.**  
 **It is havily under development.**
 
 - [x] Noise recognition.

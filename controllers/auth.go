@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	// CurrentUser keeps the current user to use on the whole package
 	CurrentUser models.User
 )
 

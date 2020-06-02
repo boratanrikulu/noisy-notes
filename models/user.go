@@ -94,9 +94,6 @@ func (user *User) Logout(token string) error {
 		return fmt.Errorf("Error occur while deleting the session.")
 	}
 
-	// Clear the current user.
-	user = nil
-
 	return nil
 }
 
