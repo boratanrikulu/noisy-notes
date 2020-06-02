@@ -11,13 +11,17 @@ import (
 )
 
 // Recognize returns text result from speech using speech-to-text api.
-func Recognize(data []byte) (string, error) {
+// Send the result to the channel.
+// c : result channel
+// e : error channel
+func Recognize(data []byte, c chan<- string, e chan<- error) {
 	ctx := context.Background()
 
 	client, err := speech.NewClient(ctx, option.WithCredentialsJSON([]byte(
 		os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"))))
 	if err != nil {
-		return "", err
+		e <- err
+		return
 	}
 
 	// Send the contents of the audio file with the encoding and
@@ -36,10 +40,15 @@ func Recognize(data []byte) (string, error) {
 
 	// Return an error message if the result is nil.
 	if resp == nil || len(resp.Results) == 0 || len(resp.Results[0].Alternatives) == 0 {
-		return "", fmt.Errorf("We could not take text from the speech.")
+		e <- fmt.Errorf("We could not take text from the speech.")
+		return
 	}
 
+	transcript := ""
 	// Return the first result.
-	transcript := resp.Results[0].Alternatives[0].Transcript
-	return transcript, nil
+	for _, result := range resp.Results {
+		transcript += result.Alternatives[0].Transcript
+	}
+
+	c <- transcript
 }

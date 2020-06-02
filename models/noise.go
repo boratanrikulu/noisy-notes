@@ -2,10 +2,10 @@ package models
 
 import (
 	"fmt"
-
-	"github.com/jinzhu/gorm"
+	"log"
 
 	"github.com/boratanrikulu/noisy-notes/noises"
+	"github.com/jinzhu/gorm"
 )
 
 // Noise model.
@@ -95,22 +95,40 @@ func (user *User) NoiseCreate(title string, file []byte) (Noise, error) {
 	return noise, nil
 }
 
-// AfterCreate runs Recognize method after the creation.
-// Set the returned Text value to the Noise.
+// AfterCreate runs starting to recognition and returns.
+// Recognition ops are run as a goroutine.
 func (noise *Noise) AfterCreate(scope *gorm.Scope) error {
-	text, err := noises.Recognize(noise.File.Data)
-	if err != nil {
-		return err
-	}
+	// result channel
+	c := make(chan string)
+	// error channel
+	e := make(chan error)
 
-	noise.IsActive = true
-	noise.Text = text
-	db := scope.DB().Save(noise)
-	if err := db.Error; err != nil {
-		return err
-	}
+	// start to recognition
+	go noises.Recognize(noise.File.Data, c, e)
+	// start  to setting results
+	go setResults(DB, noise, c, e)
 
+	// return, just return!
 	return nil
+}
+
+// setResults set the result that are recived from the channel.
+func setResults(DB *gorm.DB, noise *Noise, c chan string, e chan error) {
+	select {
+	case err := <-e:
+		log.Println(err.Error())
+		close(c)
+		close(e)
+	case text := <-c:
+		noise.IsActive = true
+		noise.Text = text
+		db := DB.Save(noise)
+		if err := db.Error; err != nil {
+			log.Println(err.Error())
+		}
+		close(c)
+		close(e)
+	}
 }
 
 // Delete deletes the noise.
