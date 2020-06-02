@@ -3,8 +3,10 @@ package noises
 import (
 	"context"
 	"fmt"
+	"os"
 
 	speech "cloud.google.com/go/speech/apiv1"
+	"google.golang.org/api/option"
 	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
@@ -12,7 +14,8 @@ import (
 func Recognize(data []byte) (string, error) {
 	ctx := context.Background()
 
-	client, err := speech.NewClient(ctx)
+	client, err := speech.NewClient(ctx, option.WithCredentialsJSON([]byte(
+		os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"))))
 	if err != nil {
 		return "", err
 	}
