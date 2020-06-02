@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 
 	"github.com/boratanrikulu/noisy-notes/controllers"
 	"github.com/boratanrikulu/noisy-notes/drivers"
@@ -60,5 +61,12 @@ func main() {
 	noises.HandleFunc("/{id}", controllers.NoiseShow).Methods("GET")
 	noises.HandleFunc("/{id}/file", controllers.NoiseFileShow).Methods("GET")
 
-	http.ListenAndServe(":"+os.Getenv("PORT"), r)
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "X-Requested-With", "Authorization"},
+		AllowedMethods:   []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
+	})
+
+	http.ListenAndServe(":"+os.Getenv("PORT"), c.Handler(r))
 }
