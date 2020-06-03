@@ -34,6 +34,7 @@ func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 
 // NoiseCreate create a noise for the current user.
 // Form must contains "title" and "file".
+// Form may contains "tags". Example: "Tag 1, Tag 2"
 func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -50,7 +51,9 @@ func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	title := r.PostFormValue("title")
-	noise, err := CurrentUser.NoiseCreate(title, b.Bytes())
+	tags := getTagsFromString(r.PostFormValue("tags"))
+
+	noise, err := CurrentUser.NoiseCreate(title, b.Bytes(), tags)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -138,6 +141,26 @@ func getNoiseFile(r *http.Request) (*bytes.Buffer, error) {
 	}
 
 	return &b, nil
+}
+
+// getTagsFromString returns a string array
+// by checking, clearing and uniqunig the given string.
+func getTagsFromString(s string) []string {
+	s = strings.TrimSpace(s)
+	if len(s) == 0 {
+		return nil
+	}
+
+	tags := []string{}
+	for _, tag := range strings.Split(s, ",") {
+		tag = strings.TrimSpace(tag)
+		if (len(tag) == 0) || contains(tags, tag) {
+			continue
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags
 }
 
 // checkMime checks if the file's mime is allowed.
