@@ -14,7 +14,7 @@ type Noise struct {
 	Title       string    `gorm:"not null"`
 	Author      User      `gorm:"foreignkey:AuthorRefer" json:"-"`
 	AuthorRefer uint      `gorm:"not null" json:"-"`
-	Tags        []Tag     `gorm:"foreignkey:NoiseRefer;association_foreignkey:ID"`
+	Tags        []Tag     `gorm:"many2many:noise_tags"`
 	File        NoiseFile `gorm:"foreignkey:NoiseRefer;association_foreignkey:ID" json:"-"`
 	Text        string
 	IsActive    bool `gorm:"default:false"`
@@ -32,6 +32,7 @@ type NoiseFile struct {
 func (user *User) GetNoises() ([]Noise, error) {
 	noises := []Noise{}
 	db := DB.Order("created_at desc").
+		Preload("Tags").
 		Model(user).
 		Association("Noises").
 		Find(&noises)
@@ -47,6 +48,7 @@ func (user *User) GetNoises() ([]Noise, error) {
 func (user *User) GetNoise(id string) (Noise, error) {
 	noise := Noise{}
 	db := DB.Where("id = ?", id).
+		Preload("Tags").
 		Model(user).
 		Association("Noises").
 		Find(&noise)
@@ -63,14 +65,10 @@ func (user *User) GetNoiseWithFile(id string) (Noise, error) {
 	noise := Noise{}
 
 	db := DB.Where("id = ?", id).
+		Preload("File").
 		Model(user).
 		Association("Noises").
 		Find(&noise)
-	if err := db.Error; err != nil {
-		return Noise{}, err
-	}
-
-	db = DB.Model(&noise).Association("File").Find(&noise.File)
 	if err := db.Error; err != nil {
 		return Noise{}, err
 	}
@@ -79,7 +77,7 @@ func (user *User) GetNoiseWithFile(id string) (Noise, error) {
 }
 
 // NoiseCreate creates a noise for the user.
-func (user *User) NoiseCreate(title string, file []byte) (Noise, error) {
+func (user *User) NoiseCreate(title string, file []byte, ts []string) (Noise, error) {
 	noise := Noise{
 		Title: title,
 		File: NoiseFile{
@@ -87,6 +85,16 @@ func (user *User) NoiseCreate(title string, file []byte) (Noise, error) {
 		},
 	}
 
+	// set tags.
+	tags, err := getFirstOrCreateTags(user, ts)
+	if err != nil {
+		return Noise{}, err
+	}
+	if len(tags) > 0 {
+		noise.Tags = tags
+	}
+
+	// create user's noise.
 	db := DB.Model(user).Association("Noises").Append(&noise)
 	if err := db.Error; err != nil {
 		return Noise{}, fmt.Errorf("Error occur while creating the noise: %v", err)
@@ -109,6 +117,16 @@ func (noise *Noise) AfterCreate(scope *gorm.Scope) error {
 	go setResults(DB, noise, c, e)
 
 	// return, just return!
+	return nil
+}
+
+// DeletePermanently deletes the noise permanently.
+func (noise *Noise) DeletePermanently() error {
+	db := DB.Unscoped().Delete(noise)
+	if err := db.Error; err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -141,12 +159,34 @@ func (noise *Noise) Delete() error {
 	return nil
 }
 
-// DeletePermanently deletes the noise permanently.
-func (noise *Noise) DeletePermanently() error {
-	db := DB.Unscoped().Delete(noise)
-	if err := db.Error; err != nil {
-		return err
+// getFirstorCreateTags returns tag array that is created
+// by checing if the user has the tag or not.
+func getFirstOrCreateTags(user *User, ts []string) ([]Tag, error) {
+	tags := []Tag{}
+
+	for _, t := range ts {
+		tag := Tag{}
+
+		db := DB.Where("title = ?", t).
+			Model(user).
+			Association("Tags").
+			Find(&tag)
+
+		// create the tag if user has not.
+		if err := db.Error; err != nil {
+			if gorm.IsRecordNotFoundError(err) {
+				tag.Title = t
+				db := DB.Model(user).Association("Tags").Append(&tag)
+				if err := db.Error; err != nil {
+					return nil, fmt.Errorf("Error occur while creating the noise: %v", err)
+				}
+			} else {
+				return nil, err
+			}
+		}
+
+		tags = append(tags, tag)
 	}
 
-	return nil
+	return tags, nil
 }

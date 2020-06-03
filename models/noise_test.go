@@ -34,7 +34,7 @@ func TestNoiseCreate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	noise, err := user.NoiseCreate(title, data)
+	noise, err := user.NoiseCreate(title, data, []string{"   Tag 1, Tag 2,     Tag 3    "})
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
