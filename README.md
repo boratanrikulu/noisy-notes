@@ -52,7 +52,7 @@ Noisy Notes gives you this ability.
 
 - Type: **POST**
 - Body: 
-    - Form Data :
+	- Form Data :
 		- username (must) (at least 2 characters)
 		- password (must) (at least 8 characters)
 		- name (must)
@@ -107,7 +107,7 @@ Response:
 
 - Type: **POST**
 - Body: 
-    - Form Data :
+	- Form Data :
 		- username (must)
 		- password (must)
 
@@ -151,7 +151,7 @@ Response:
 
 - Type: **GET**
 - Header: 
-    - Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token (must)
 
 **Response:**
 
@@ -201,12 +201,12 @@ When recognition is done, the noise will be activated.
 
 - Type: **POST**
 - Header: 
-    - Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token (must)
 - Body:
 	- Form Data :
 		- title (must)
 		- file (must) (audio/mpeg)
-        - tags (example: "Tag 1, Tag 2, Tag3")
+		- tags (example: "Tag 1, Tag 2, Tag3")
 
 **Response:**
 
@@ -226,7 +226,7 @@ Request:
 curl --location --request POST 'localhost:3000/user/noises' \
 	--header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1' \
 	--form 'title=First noise note' \
-    --form 'tags=Tag 1, Tag 2, Tag 3' \
+	--form 'tags=Tag 1, Tag 2, Tag 3' \
 	--form 'file=@/path/to/audio_test.mp3'
 ```
 
@@ -277,7 +277,7 @@ Response:
 
 - Type: **GET**
 - Header: 
-    - Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token (must)
 
 **Response:**
 
@@ -363,7 +363,7 @@ Response:
 
 - Type: **GET**
 - Header: 
-    - Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token (must)
 - Path:
 	- ID
 
@@ -433,7 +433,7 @@ Response:
 
 - Type: **GET**
 - Header: 
-    - Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token (must)
 - Path:
 	- ID
 
@@ -472,7 +472,7 @@ file
 
 - Type: **POST**
 - Header: 
-    - Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token (must)
 
 **Response:**
 
