@@ -27,6 +27,7 @@ Noisy Notes gives you this ability.
 - [x] Session create and delete endpoints.
 - [x] CRUD for the noise.
 - [x] Make a queue structure for recognition.
+- [x] Add tag option for noises.
 - [ ] Search endpoint.
 
 ## API Endpoints
@@ -205,6 +206,7 @@ When recognition is done, the noise will be activated.
 	- Form Data :
 		- title (must)
 		- file (must) (audio/mpeg)
+        - tags (example: "Tag 1, Tag 2, Tag3")
 
 **Response:**
 
@@ -224,6 +226,7 @@ Request:
 curl --location --request POST 'localhost:3000/user/noises' \
 	--header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1' \
 	--form 'title=First noise note' \
+    --form 'tags=Tag 1, Tag 2, Tag 3' \
 	--form 'file=@/path/to/audio_test.mp3'
 ```
 
@@ -236,7 +239,29 @@ Response:
     "UpdatedAt": "2020-06-02T16:53:00.500487332+03:00",
     "DeletedAt": null,
     "Title": "First noise note",
-    "Tags": null,
+    "Tags": [
+        {
+            "ID": 1,
+            "CreatedAt": "2020-06-04T01:55:19.545495012+03:00",
+            "UpdatedAt": "2020-06-04T01:55:19.561174344+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 1"
+        },
+        {
+            "ID": 2,
+            "CreatedAt": "2020-06-04T01:55:19.55087435+03:00",
+            "UpdatedAt": "2020-06-04T01:55:19.562559461+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 2"
+        },
+        {
+            "ID": 3,
+            "CreatedAt": "2020-06-04T01:55:19.556297971+03:00",
+            "UpdatedAt": "2020-06-04T01:55:19.563764474+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 3"
+        }
+    ],
     "Text": "",
     "IsActive": false
 }
@@ -281,8 +306,48 @@ Response:
         "UpdatedAt": "2020-06-02T16:53:02.703716+03:00",
         "DeletedAt": null,
         "Title": "First noise note",
-        "Tags": null,
+        "Tags": [
+            {
+                "ID": 1,
+                "CreatedAt": "2020-06-04T01:55:19.545495012+03:00",
+                "UpdatedAt": "2020-06-04T01:55:19.561174344+03:00",
+                "DeletedAt": null,
+                "Title": "Tag 1"
+            },
+            {
+                "ID": 2,
+                "CreatedAt": "2020-06-04T01:55:19.55087435+03:00",
+                "UpdatedAt": "2020-06-04T01:55:19.562559461+03:00",
+                "DeletedAt": null,
+                "Title": "Tag 2"
+            },
+            {
+                "ID": 3,
+                "CreatedAt": "2020-06-04T01:55:19.556297971+03:00",
+                "UpdatedAt": "2020-06-04T01:55:19.563764474+03:00",
+                "DeletedAt": null,
+                "Title": "Tag 3"
+            }
+        ],
         "Text": "Tavşan ile kuşun macerası",
+        "IsActive": true
+    },
+    {
+        "ID": 52,
+        "CreatedAt": "2020-06-02T16:59:00.500487+03:00",
+        "UpdatedAt": "2020-06-02T16:59:02.703716+03:00",
+        "DeletedAt": null,
+        "Title": "Second noise note",
+        "Tags": [
+            {
+                "ID": 1,
+                "CreatedAt": "2020-06-04T01:55:19.545495012+03:00",
+                "UpdatedAt": "2020-06-04T01:55:19.561174344+03:00",
+                "DeletedAt": null,
+                "Title": "Tag 1"
+            },
+        ],
+        "Text": "Tavşan tatlıdır",
         "IsActive": true
     }
 ]
@@ -330,7 +395,29 @@ Response:
     "UpdatedAt": "2020-06-02T16:53:02.703716+03:00",
     "DeletedAt": null,
     "Title": "First noise note",
-    "Tags": null,
+    "Tags": [
+        {
+            "ID": 1,
+            "CreatedAt": "2020-06-04T01:55:19.545495012+03:00",
+            "UpdatedAt": "2020-06-04T01:55:19.561174344+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 1"
+        },
+        {
+            "ID": 2,
+            "CreatedAt": "2020-06-04T01:55:19.55087435+03:00",
+            "UpdatedAt": "2020-06-04T01:55:19.562559461+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 2"
+        },
+        {
+            "ID": 3,
+            "CreatedAt": "2020-06-04T01:55:19.556297971+03:00",
+            "UpdatedAt": "2020-06-04T01:55:19.563764474+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 3"
+        }
+    ],
     "Text": "Tavşan ile kuşun macerası",
     "IsActive": true
 }
