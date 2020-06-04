@@ -28,15 +28,24 @@ type NoiseFile struct {
 	NoiseRefer uint   `gorm:"not null"`
 }
 
-// GetNoises returns all noises for the user.
+// GetNoises returns all noises
+// that are matched by checking title and text of noises
+// and title of noises' tags.
+// It can take sort type and take limit size variables.
 func (user *User) GetNoises(q string, sort string, take int) ([]Noise, error) {
 	noises := []Noise{}
+
 	db := DB.Order("updated_at "+sort).
 		Limit(take).
 		Preload("Tags").
-		Where("title ILIKE ? OR text ILIKE ?",
+		Where("noises.title ILIKE ? OR noises.text ILIKE ? OR EXISTS(?)",
 			"%%"+q+"%%",
-			"%%"+q+"%%").
+			"%%"+q+"%%",
+			DB.Table("tags").
+				Joins("JOIN noise_tags ON noise_tags.noise_id = noises.id").
+				Where("tags.id = noise_tags.tag_id AND tags.title ILIKE ?",
+					"%%"+q+"%%").
+				SubQuery()).
 		Model(user).
 		Association("Noises").
 		Find(&noises)
