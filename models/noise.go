@@ -29,10 +29,14 @@ type NoiseFile struct {
 }
 
 // GetNoises returns all noises for the user.
-func (user *User) GetNoises() ([]Noise, error) {
+func (user *User) GetNoises(q string, sort string, take int) ([]Noise, error) {
 	noises := []Noise{}
-	db := DB.Order("created_at desc").
+	db := DB.Order("updated_at "+sort).
+		Limit(take).
 		Preload("Tags").
+		Where("title ILIKE ? OR text ILIKE ?",
+			"%%"+q+"%%",
+			"%%"+q+"%%").
 		Model(user).
 		Association("Noises").
 		Find(&noises)

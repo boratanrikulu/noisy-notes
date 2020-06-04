@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -15,7 +16,19 @@ import (
 func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	noises, err := CurrentUser.GetNoises()
+	q, sort, take, err := getParamsFromRequest(r)
+	if err != nil {
+		// Return 403. There is an issue with creating noise.
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(struct {
+			Error string
+		}{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	noises, err := CurrentUser.GetNoises(q, sort, take)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -141,6 +154,34 @@ func getNoiseFile(r *http.Request) (*bytes.Buffer, error) {
 	}
 
 	return &b, nil
+}
+
+func getParamsFromRequest(r *http.Request) (q string, sort string, take int, err error) {
+	// query, it may be a word or a sentence..
+	q = strings.TrimSpace(r.FormValue("q"))
+
+	// sort, only allowed "asc" and "desc"
+	sort = strings.ToLower(strings.TrimSpace(r.FormValue("sort")))
+	if sort == "" {
+		sort = "desc"
+	}
+	if sort != "asc" && sort != "desc" {
+		err = fmt.Errorf("Sort must be \"asc\" or \"desc\"")
+		return
+	}
+
+	// take, must be an integer
+	t := r.FormValue("take")
+	take = -1 // set default if take is not exist.
+	if t != "" {
+		take, err = strconv.Atoi(t)
+	}
+	if err != nil {
+		err = fmt.Errorf("Take must be a integer")
+		return
+	}
+
+	return
 }
 
 // getTagsFromString returns a string array
