@@ -28,7 +28,8 @@ Noisy Notes gives you this ability.
 - [x] CRUD for the noise.
 - [x] Make a queue structure for recognition.
 - [x] Add tag option for noises.
-- [ ] Search endpoint.
+- [x] Search endpoint.
+- [ ] Tags endpoint that is returned noises for user's tag.
 
 ## API Endpoints
 
@@ -206,7 +207,7 @@ When recognition is done, the noise will be activated.
 	- Form Data :
 		- title (must)
 		- file (must) (audio/mpeg)
-		- tags (example: "Tag 1, Tag 2, Tag3")
+		- tags (example: `Tag 1, Tag 2, Tag3`)
 
 **Response:**
 
@@ -278,6 +279,16 @@ Response:
 - Type: **GET**
 - Header: 
 	- Authorization: **Bearer** Token (must)
+- Params:
+    - q
+    > to search,  
+    it checks `noises' titles`, `noises' texts` and `tags' titles`
+    - take
+    > to limit size to take  
+    default: `-1`
+    - sort
+    > to sort by updated_at, only allowed: `asc`, `desc`.  
+    default: `desc`
 
 **Response:**
 
@@ -293,7 +304,10 @@ Request:
 
 ```bash
 curl --location --request GET 'localhost:3000/user/noises' \
-	--header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1'
+    --header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1' \
+    --form 'q=tavşan' \
+    --form 'sort=asc' \
+    --form 'take=2'
 ```
 
 Response:
@@ -487,7 +501,7 @@ Request:
 
 ```sh
 curl --location --request POST 'localhost:3000/user/logout' \
---header 'Authorization: Bearer ce356970-ea02-4cb8-8291-112d61cef3aa'
+    --header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1'
 ```
 
 Response:
