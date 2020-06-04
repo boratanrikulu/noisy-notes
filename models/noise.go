@@ -28,10 +28,9 @@ type NoiseFile struct {
 	NoiseRefer uint   `gorm:"not null"`
 }
 
-// GetNoises returns all noises
-// that are matched by checking title and text of noises
-// and title of noises' tags.
-// It can take sort type and take limit size variables.
+// GetNoises returns all noises that are matched by checking
+// noises' titles, noises' texts and tags' titles.
+// It can set sort type and limit.
 func (user *User) GetNoises(q string, sort string, take int) ([]Noise, error) {
 	noises := []Noise{}
 
