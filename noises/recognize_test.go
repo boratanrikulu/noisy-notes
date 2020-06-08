@@ -1,6 +1,7 @@
 package noises
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"testing"
@@ -12,12 +13,18 @@ func TestRecognize(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	b := bytes.NewReader(data)
+	cB, err := Convert(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// result channel
 	c := make(chan string)
 	// error channel
 	e := make(chan error)
 
-	go Recognize(data, c, e)
+	go Recognize(cB, c, e)
 
 	select {
 	case err := <-e:

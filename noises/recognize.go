@@ -28,9 +28,9 @@ func Recognize(data []byte, c chan<- string, e chan<- error) {
 	// and sample rate information to be transcripted.
 	resp, err := client.Recognize(ctx, &speechpb.RecognizeRequest{
 		Config: &speechpb.RecognitionConfig{
-			Encoding:                   speechpb.RecognitionConfig_ENCODING_UNSPECIFIED,
+			Encoding:                   speechpb.RecognitionConfig_LINEAR16,
 			SampleRateHertz:            16000,
-			LanguageCode:               "tr-Tr",
+			LanguageCode:               "tr-TR",
 			EnableAutomaticPunctuation: true,
 		},
 		Audio: &speechpb.RecognitionAudio{

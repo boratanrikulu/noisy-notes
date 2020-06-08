@@ -9,7 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
+
+	"github.com/boratanrikulu/noisy-notes/noises"
 )
 
 // NoiseIndex returns all noise for the current user.
@@ -66,7 +69,7 @@ func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	title := r.PostFormValue("title")
 	tags := getTagsFromString(r.PostFormValue("tags"))
 
-	noise, err := CurrentUser.NoiseCreate(title, b.Bytes(), tags)
+	noise, err := CurrentUser.NoiseCreate(title, b, tags)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
 		w.WriteHeader(http.StatusForbidden)
@@ -128,15 +131,15 @@ func NoiseFileShow(w http.ResponseWriter, r *http.Request) {
 
 	resp := bytes.NewReader(noise.File.Data)
 
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%v.mp3\"", noise.Title))
-	w.Header().Set("Content-Type", "audio/mpeg;")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%v.wav\"", noise.Title))
+	w.Header().Set("Content-Type", "audio/wav;")
 
 	io.Copy(w, resp)
 }
 
 // getNoiseFile returns a buffer for the file from the request.
-func getNoiseFile(r *http.Request) (*bytes.Buffer, error) {
-	// Set file
+func getNoiseFile(r *http.Request) ([]byte, error) {
+	// read the file.
 	r.ParseMultipartForm(1 << 20) // 10 MB size limit
 	file, _, err := r.FormFile("file")
 	if err != nil {
@@ -144,16 +147,32 @@ func getNoiseFile(r *http.Request) (*bytes.Buffer, error) {
 	}
 	defer file.Close()
 
-	var b bytes.Buffer
-	io.Copy(&b, file)
+	// get the mime from file.
+	mime, err := mimetype.DetectReader(file)
+	if err != nil {
+		return nil, fmt.Errorf("We could not find file's mime.")
+	}
+	file.Seek(0, 0)
 
-	// Check the format.
-	err = checkMime(b.Bytes())
+	// check the mime if is allowed.
+	allowed := []string{"audio/mpeg",
+		"audio/mp3",
+		"audio/ogg",
+		"audio/wav",
+		"audio/flac",
+		"audio/aac"}
+	if !mimetype.EqualsAny(mime.String(), allowed...) {
+		return nil, fmt.Errorf("Not allowed format: %v\nPlease upload one of the this formats: %v",
+			mime.String(), strings.Join(allowed, ", "))
+	}
+
+	// convert file to wav.
+	cB, err := noises.Convert(file)
 	if err != nil {
 		return nil, err
 	}
 
-	return &b, nil
+	return cB, nil
 }
 
 func getParamsFromRequest(r *http.Request) (q string, sort string, take int, err error) {
@@ -202,17 +221,6 @@ func getTagsFromString(s string) []string {
 	}
 
 	return tags
-}
-
-// checkMime checks if the file's mime is allowed.
-func checkMime(b []byte) error {
-	allowed := []string{"audio/mpeg"}
-	mime := http.DetectContentType(b)
-	if contains(allowed, mime) {
-		return nil
-	}
-	return fmt.Errorf("Not allowed format: %v\nPlease upload one of the this formats: %v",
-		mime, strings.Join(allowed, ", "))
 }
 
 // contains tells whether a contains x.

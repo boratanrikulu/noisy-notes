@@ -54,10 +54,16 @@ Noisy Notes gives you this ability.
 - Type: **POST**
 - Body: 
 	- Form Data :
-		- username (must) (at least 2 characters)
-		- password (must) (at least 8 characters)
-		- name (must)
-		- surname (must)
+		- username  
+        > `must`  
+        `at least 2 characters`
+		- password  
+        > `must`  
+        `at least 8 characters`
+		- name  
+        > `must`  
+		- surname  
+        > `must`  
 
 **Response:**
 
@@ -109,8 +115,10 @@ Response:
 - Type: **POST**
 - Body: 
 	- Form Data :
-		- username (must)
-		- password (must)
+		- username  
+        > `must`  
+		- password  
+        > `must`  
 
 **Response:**
 
@@ -152,7 +160,8 @@ Response:
 
 - Type: **GET**
 - Header: 
-	- Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token  
+    > `must`  
 
 **Response:**
 
@@ -202,12 +211,19 @@ When recognition is done, the noise will be activated.
 
 - Type: **POST**
 - Header: 
-	- Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token  
+    > `must` 
 - Body:
 	- Form Data :
-		- title (must)
-		- file (must) (audio/mpeg)
-		- tags (example: `Tag 1, Tag 2, Tag3`)
+		- title  
+        > `must` 
+		- file  
+        > `must`  
+        > Audio format may be one of them;  
+        `audio/mpeg`, `audio/mp3`, `audio/ogg`, `audio/wav`, `audio/flac`, `audio/aac`
+		- tags
+        > `not must`  
+        example: `Tag 1, Tag 2, Tag3`
 
 **Response:**
 
@@ -278,15 +294,19 @@ Response:
 
 - Type: **GET**
 - Header: 
-	- Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token  
+    > `must` 
 - Params:
     - q
+    > `not must`  
     > to search,  
     it checks `noises' titles`, `noises' texts` and `tags' titles`
     - take
-    > to limit size to take  
+    > `not must`  
+    > to limit size to take,  
     default: `-1`
     - sort
+    > `not must`  
     > to sort by updated_at, only allowed: `asc`, `desc`.  
     default: `desc`
 
@@ -377,7 +397,8 @@ Response:
 
 - Type: **GET**
 - Header: 
-	- Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token  
+    > `must` 
 - Path:
 	- ID
 
@@ -447,7 +468,8 @@ Response:
 
 - Type: **GET**
 - Header: 
-	- Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token  
+    > `must` 
 - Path:
 	- ID
 
@@ -486,7 +508,8 @@ file
 
 - Type: **POST**
 - Header: 
-	- Authorization: **Bearer** Token (must)
+	- Authorization: **Bearer** Token  
+    > `must` 
 
 **Response:**
 
