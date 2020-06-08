@@ -117,7 +117,7 @@ func (user *User) NoiseCreate(title string, file []byte, ts []string) (Noise, er
 
 // AfterCreate runs starting to recognition and returns.
 // Recognition ops are run as a goroutine.
-func (noise *Noise) AfterCreate(scope *gorm.Scope) error {
+func (noise *Noise) AfterSave(scope *gorm.Scope) error {
 	// result channel
 	c := make(chan string)
 	// error channel
@@ -130,6 +130,35 @@ func (noise *Noise) AfterCreate(scope *gorm.Scope) error {
 
 	// return, just return!
 	return nil
+}
+
+// Update updates the noise with given attributes.
+func (noise *Noise) Update(user *User, title string, file []byte, ts []string) (Noise, error) {
+	// create the new noise.
+	newNoise := Noise{
+		Title: title,
+		File: NoiseFile{
+			Data: file,
+		},
+		IsActive: false,
+	}
+
+	// set tags.
+	tags, err := getFirstOrCreateTags(user, ts)
+	if err != nil {
+		return Noise{}, err
+	}
+	if len(tags) > 0 {
+		newNoise.Tags = tags
+	}
+
+	// update the noise with new attributes.
+	db := DB.Model(noise).Update(newNoise)
+	if err := db.Error; err != nil {
+		return Noise{}, fmt.Errorf("Error occur while updating the noise: %v", err)
+	}
+
+	return *noise, nil
 }
 
 // Delete temporarily deletes the noise.

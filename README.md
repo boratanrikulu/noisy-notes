@@ -41,6 +41,7 @@ Noisy Notes gives you this ability.
 	- [**Get Noises**](#get-noises)
 	- [**Get Noise**](#get-noise)
 	- [**Get Noise's File**](#get-noises-file)
+    - [**Update Noise**](#update-noise)
     - [**Delete Noise**](#delete-noise)
 	- [**Logout**](#logout)
 
@@ -233,7 +234,7 @@ When recognition is done, the noise will be activated.
 - Type: **403**
 	- That means input are not valid.
 - Type: **202**
-	- That means the noisy note was create.
+	- That means the noisy note was created.
 	- Includes the noisy notes.
 
 **Example:**
@@ -499,9 +500,84 @@ Response:
 file
 ```
 
+## Update Noise
+
+> Updates the noise.
+> It works just like [creating](#create-noise)
+
+> Recognition with the file will be work on a queue,  
+So,  
+It will be inactive firstly.  
+When recognition is done, the noise will be activated.
+
+**URL:** /user/noises
+
+**Request:**
+
+- Type: **PUT**
+- Header: 
+    - Authorization: **Bearer** Token  
+    > `must` 
+- Body:
+    - Form Data :
+        - title  
+        > `must` 
+        - file  
+        > `must`  
+        > Audio format may be one of them;  
+        `audio/mpeg`, `audio/mp3`, `audio/ogg`, `audio/wav`, `audio/flac`, `audio/aac`
+        - tags
+        > `not must`  
+        example: `Tag 1, Tag 2, Tag3`
+
+**Response:**
+
+- Type: **401**
+    - That means the token is not valid.
+- Type: **403**
+    - That means input are not valid.
+- Type: **202**
+    - That means the noisy note was updated.
+    - Includes the new noisy notes.
+
+**Example:**
+
+Request:
+
+```bash
+curl --location --request PUT 'localhost:3000/user/noises' \
+    --header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1' \
+    --form 'title=A new title' \
+    --form 'tags=Tag 4' \
+    --form 'file=@/path/to/audio_test.mp3'
+```
+
+Response:
+
+```json
+{
+    "ID": 51,
+    "CreatedAt": "2020-06-02T16:53:00.500487332+03:00",
+    "UpdatedAt": "2020-06-03T20:53:00.500487332+03:00",
+    "DeletedAt": null,
+    "Title": "A new title",
+    "Tags": [
+        {
+            "ID": 4,
+            "CreatedAt": "2020-06-03T20:53:0.556297971+03:00",
+            "UpdatedAt": "2020-06-03T20:53:0.563764474+03:00",
+            "DeletedAt": null,
+            "Title": "Tag 4"
+        }
+    ],
+    "Text": "Tavşan ile kuşun macerası",
+    "IsActive": false
+}
+```
+
 ## Delete Noise
 
-> Return a specific noise. 
+> Deletes the noise. 
 
 **URL:** /user/noises/{id}
 
