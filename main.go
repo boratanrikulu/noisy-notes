@@ -64,8 +64,17 @@ func main() {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
-		AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "X-Requested-With", "Authorization"},
-		AllowedMethods:   []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
+		AllowedHeaders: []string{"Origin",
+			"Accept",
+			"Content-Type",
+			"X-Requested-With",
+			"Authorization",
+			"Content-Type",
+			"Content-Length",
+			"Host",
+			"Connection",
+			"Content-Disposition"},
+		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
 	})
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), c.Handler(r))
