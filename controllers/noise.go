@@ -133,7 +133,7 @@ func NoiseUpdate(w http.ResponseWriter, r *http.Request) {
 	title := r.PostFormValue("title")
 	tags := getTagsFromString(r.PostFormValue("tags"))
 
-	newNoise, err := noise.Update(&CurrentUser, title, b, tags)
+	err = noise.Update(&CurrentUser, title, b, tags)
 	if err != nil {
 		// Return 403. There is an issue with updating noise.
 		helpers.ReturnError(w, http.StatusForbidden, err.Error())
@@ -142,7 +142,7 @@ func NoiseUpdate(w http.ResponseWriter, r *http.Request) {
 
 	// Return 202. Noise is update.
 	w.WriteHeader(http.StatusAccepted)
-	_ = json.NewEncoder(w).Encode(newNoise)
+	_ = json.NewEncoder(w).Encode(noise)
 }
 
 // NoiseDelete temporarily deletes the given noise and it's file

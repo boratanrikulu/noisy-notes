@@ -133,32 +133,30 @@ func (noise *Noise) AfterSave(scope *gorm.Scope) error {
 }
 
 // Update updates the noise with given attributes.
-func (noise *Noise) Update(user *User, title string, file []byte, ts []string) (Noise, error) {
+func (noise *Noise) Update(user *User, title string, file []byte, ts []string) error {
 	// create the new noise.
-	newNoise := Noise{
-		Title: title,
-		File: NoiseFile{
-			Data: file,
-		},
-		IsActive: false,
+	noise.Title = title
+	noise.File = NoiseFile{
+		Data: file,
 	}
+	noise.IsActive = false
 
 	// set tags.
 	tags, err := getFirstOrCreateTags(user, ts)
 	if err != nil {
-		return Noise{}, err
+		return err
 	}
-	if len(tags) > 0 {
-		newNoise.Tags = tags
+	db := DB.Model(noise).Association("Tags").Replace(tags)
+	if err := db.Error; err != nil {
+		return fmt.Errorf("Error occur while updating the noise: %v", err)
 	}
 
 	// update the noise with new attributes.
-	db := DB.Model(noise).Update(newNoise)
-	if err := db.Error; err != nil {
-		return Noise{}, fmt.Errorf("Error occur while updating the noise: %v", err)
+	if err := DB.Save(noise).Error; err != nil {
+		return fmt.Errorf("Error occur while updating the noise: %v", err)
 	}
 
-	return *noise, nil
+	return nil
 }
 
 // Delete temporarily deletes the noise.

@@ -510,7 +510,7 @@ So,
 It will be inactive firstly.  
 When recognition is done, the noise will be activated.
 
-**URL:** /user/noises
+**URL:** /user/noises/{id}
 
 **Request:**
 
@@ -518,6 +518,8 @@ When recognition is done, the noise will be activated.
 - Header: 
     - Authorization: **Bearer** Token  
     > `must` 
+- Path:
+    - ID
 - Body:
     - Form Data :
         - title  
