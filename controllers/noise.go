@@ -12,6 +12,7 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 
+	"github.com/boratanrikulu/noisy-notes/controllers/helpers"
 	"github.com/boratanrikulu/noisy-notes/noises"
 )
 
@@ -22,24 +23,14 @@ func NoiseIndex(w http.ResponseWriter, r *http.Request) {
 	q, sort, take, err := getParamsFromRequest(r)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
 	noises, err := CurrentUser.GetNoises(q, sort, take)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -57,12 +48,7 @@ func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	b, err := getNoiseFile(r)
 	if err != nil {
 		// Return 403. There is an issue with getting noise file.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -72,12 +58,7 @@ func NoiseCreate(w http.ResponseWriter, r *http.Request) {
 	noise, err := CurrentUser.NoiseCreate(title, b, tags)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -97,12 +78,7 @@ func NoiseShow(w http.ResponseWriter, r *http.Request) {
 	noise, err := CurrentUser.GetNoise(id)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -120,12 +96,7 @@ func NoiseFileShow(w http.ResponseWriter, r *http.Request) {
 	noise, err := CurrentUser.GetNoiseWithFile(id)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -147,23 +118,14 @@ func NoiseDelete(w http.ResponseWriter, r *http.Request) {
 	noise, err := CurrentUser.GetNoise(id)
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
+		return
 	}
 
 	err = noise.Delete()
 	if err != nil {
 		// Return 403. There is an issue with creating noise.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 

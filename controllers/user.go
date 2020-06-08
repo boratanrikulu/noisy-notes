@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/boratanrikulu/noisy-notes/controllers/helpers"
 	"github.com/boratanrikulu/noisy-notes/models"
 )
 
@@ -20,13 +21,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	user, err := models.SignUp(name, surname, username, password)
 	if err != nil {
 		// Return 403. There is an issue with creating account.
-		w.WriteHeader(http.StatusForbidden)
-
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -52,13 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	token, err := models.Login(username, password)
 	if err != nil {
 		// Return 403. There is an issue with login.
-		w.WriteHeader(http.StatusForbidden)
-
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 
@@ -93,12 +82,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	err := CurrentUser.Logout(token)
 	if err != nil {
 		// Return 403. There is an issue with the taking token.
-		w.WriteHeader(http.StatusForbidden)
-		_ = json.NewEncoder(w).Encode(struct {
-			Error string
-		}{
-			Error: err.Error(),
-		})
+		helpers.ReturnError(w, http.StatusForbidden, err.Error())
 		return
 	}
 

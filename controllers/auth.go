@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/boratanrikulu/noisy-notes/controllers/helpers"
 	"github.com/boratanrikulu/noisy-notes/models"
 )
 
@@ -23,12 +23,7 @@ func UserAuthMiddleware(next http.Handler) http.Handler {
 		if err != nil {
 			// Return 401. There is an issue with gettin current user.
 			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-			w.WriteHeader(http.StatusUnauthorized)
-			_ = json.NewEncoder(w).Encode(struct {
-				Error string
-			}{
-				Error: err.Error(),
-			})
+			helpers.ReturnError(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
