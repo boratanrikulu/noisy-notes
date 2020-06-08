@@ -59,6 +59,7 @@ func main() {
 	noises.HandleFunc("", controllers.NoiseIndex).Methods("GET")
 	noises.HandleFunc("", controllers.NoiseCreate).Methods("POST")
 	noises.HandleFunc("/{id}", controllers.NoiseShow).Methods("GET")
+	noises.HandleFunc("/{id}", controllers.NoiseDelete).Methods("DELETE")
 	noises.HandleFunc("/{id}/file", controllers.NoiseFileShow).Methods("GET")
 
 	c := cors.New(cors.Options{
@@ -74,7 +75,7 @@ func main() {
 			"Host",
 			"Connection",
 			"Content-Disposition"},
-		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
+		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"},
 	})
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), c.Handler(r))

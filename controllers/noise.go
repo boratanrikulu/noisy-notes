@@ -137,6 +137,45 @@ func NoiseFileShow(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, resp)
 }
 
+// NoiseDelete temporarily deletes the given noise and it's file
+func NoiseDelete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	noise, err := CurrentUser.GetNoise(id)
+	if err != nil {
+		// Return 403. There is an issue with creating noise.
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(struct {
+			Error string
+		}{
+			Error: err.Error(),
+		})
+	}
+
+	err = noise.Delete()
+	if err != nil {
+		// Return 403. There is an issue with creating noise.
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(struct {
+			Error string
+		}{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	// Return 200. Noise is deleted.
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(struct {
+		Message string
+	}{
+		Message: "The noise is deleted.",
+	})
+}
+
 // getNoiseFile returns a buffer for the file from the request.
 func getNoiseFile(r *http.Request) ([]byte, error) {
 	// read the file.

@@ -132,6 +132,16 @@ func (noise *Noise) AfterCreate(scope *gorm.Scope) error {
 	return nil
 }
 
+// Delete temporarily deletes the noise.
+func (noise *Noise) Delete() error {
+	d := DB.Delete(noise)
+	if err := d.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // DeletePermanently deletes the noise permanently.
 func (noise *Noise) DeletePermanently() error {
 	db := DB.Unscoped().Delete(noise)
@@ -159,16 +169,6 @@ func setResults(DB *gorm.DB, noise *Noise, c chan string, e chan error) {
 		close(c)
 		close(e)
 	}
-}
-
-// Delete deletes the noise.
-func (noise *Noise) Delete() error {
-	db := DB.Delete(noise)
-	if err := db.Error; err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // getFirstorCreateTags returns tag array that is created

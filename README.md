@@ -41,6 +41,7 @@ Noisy Notes gives you this ability.
 	- [**Get Noises**](#get-noises)
 	- [**Get Noise**](#get-noise)
 	- [**Get Noise's File**](#get-noises-file)
+    - [**Delete Noise**](#delete-noise)
 	- [**Logout**](#logout)
 
 ## Signup
@@ -496,6 +497,47 @@ Response:
 
 ```json
 file
+```
+
+## Delete Noise
+
+> Return a specific noise. 
+
+**URL:** /user/noises/{id}
+
+**Request:**
+
+- Type: **DELETE**
+- Header: 
+    - Authorization: **Bearer** Token  
+    > `must` 
+- Path:
+    - ID
+
+**Response:**
+
+- Type: **401**
+    - That means the token is not valid.
+- Type: **403**
+    - That means record was not found.
+- Type: **200**
+    - That means the noise were deleted.
+
+**Example:**
+
+Request:
+
+```bash
+curl --location --request DELETE 'localhost:3000/user/noises/51' \
+    --header 'Authorization: Bearer 2ec69760-ef38-4a47-af5c-0ef1a7e6ecf1'
+```
+
+Response:
+
+```json
+{
+    "Message": "The noise is deleted."
+}
 ```
 
 ## Logout
